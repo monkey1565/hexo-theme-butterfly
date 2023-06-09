@@ -9,9 +9,14 @@ nav:
 
 # Menu 目錄
 menu:
-  # Home: / || fas fa-home
+  Home: / || fa fa-home
   # Archives: /archives/ || fas fa-archive
   # Tags: /tags/ || fas fa-tags
+  # 分類||fas fa-folder-open:
+  登山健行: /outdoor/ || fas fa-hiking
+  攝影: /photography/ || fas fa-camera-retro
+  DIY: /iot/ || fas fa-toolbox 
+  小物開箱: /unboxing/ || fas fa-box-open
   # Categories: /categories/ || fas fa-folder-open
   # List||fas fa-list:
   #   Music: /music/ || fas fa-music
