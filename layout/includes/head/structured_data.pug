@@ -1,0 +1,115 @@
+if theme.structured_data
+  -
+    // use json-ld to add structured data
+    const siteUrl = config.url
+    const pageUrl = globalPageType === 'home' ? full_url_for('/') : (page.permalink || full_url_for(url_for(page.path || '/')))
+    const title = page.title || config.title
+    const descriptionVal = page.description || page.excerpt || page.content || config.description
+    const description = descriptionVal ? strip_html(descriptionVal).replace(/\s+/g, ' ').trim() : ''
+    const imageVal = page.cover_type === 'img' ? page.cover : theme.avatar.img
+    const image = imageVal ? full_url_for(imageVal) : ''
+    const inLanguage = Array.isArray(config.language) ? config.language[0] : (config.language || 'zh-TW')
+    const socialLinks = theme.social ? Object.values(theme.social)
+      .map(item => item && item.split(' || ')[0])
+      .filter(link => /^https?:\/\//.test(link)) : []
+
+    const organization = {
+      "@type": "Organization",
+      "@id": `${siteUrl}#organization`,
+      "name": config.author || config.title,
+      "url": siteUrl,
+      "alternateName": config.title
+    }
+
+    if (image) {
+      organization.logo = {
+        "@type": "ImageObject",
+        "url": image
+      }
+    }
+
+    if (socialLinks.length > 0) {
+      organization.sameAs = socialLinks
+    }
+
+    const website = {
+      "@type": "WebSite",
+      "@id": `${siteUrl}#website`,
+      "url": siteUrl,
+      "name": config.title,
+      "alternateName": ["WhatWillSay", "whatwillsay.tw"],
+      "description": config.description,
+      "inLanguage": inLanguage,
+      "publisher": {
+        "@id": `${siteUrl}#organization`
+      }
+    }
+
+    const webPage = {
+      "@type": "WebPage",
+      "@id": `${pageUrl}#webpage`,
+      "url": pageUrl,
+      "name": title,
+      "isPartOf": {
+        "@id": `${siteUrl}#website`
+      },
+      "inLanguage": inLanguage
+    }
+
+    if (description) {
+      webPage.description = description
+    }
+
+    const graph = [organization, website, webPage]
+
+    if (page.layout === 'post') {
+      const datePublished = page.date.toISOString()
+      const dateModified = (page.updated || page.date).toISOString()
+      const author = page.copyright_author || config.author
+      const authorHrefVal = page.copyright_author_href || theme.post_copyright.author_href || site.url
+      const authorHref = full_url_for(authorHrefVal)
+      const article = {
+        "@type": "BlogPosting",
+        "@id": `${pageUrl}#article`,
+        "headline": title,
+        "url": pageUrl,
+        "datePublished": datePublished,
+        "dateModified": dateModified,
+        "mainEntityOfPage": {
+          "@id": `${pageUrl}#webpage`
+        },
+        "isPartOf": {
+          "@id": `${siteUrl}#website`
+        },
+        "author": [{
+          "@type": "Person",
+          "name": author,
+          "url": authorHref
+        }],
+        "publisher": {
+          "@id": `${siteUrl}#organization`
+        },
+        "inLanguage": inLanguage
+      }
+
+      if (image) {
+        article.image = image
+      }
+
+      if (description) {
+        article.description = description
+      }
+
+      graph.push(article)
+    }
+
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@graph": graph
+    }
+
+    const jsonLdScript = JSON.stringify(jsonLd, null, 2)
+  -
+
+  script(type="application/ld+json").
+    !{jsonLdScript}

@@ -1,14 +1,20 @@
 if theme.Open_Graph_meta.enable
   -
     const coverVal = page.cover_type === 'img' ? page.cover : theme.avatar.img
+    const rawDescription = page.description || page.excerpt || page.content || page.title || config.description
+    const description = rawDescription ? strip_html(rawDescription).replace(/\s+/g, ' ').trim() : ''
     let ogOption = Object.assign({
-      type: is_post() ? 'article' : 'website',
+      type: globalPageType === 'post' ? 'article' : 'website',
       image: coverVal ? full_url_for(coverVal) : '',
+      description,
       fb_admins: theme.facebook_comments.user_id || '',
       fb_app_id: theme.facebook_comments.app_id || '',
     }, theme.Open_Graph_meta.option)
   -
   != open_graph(ogOption)
 else
-  meta(name="description" content=page_description())
+  - const rawDescription = page.description || page.excerpt || page.content || page.title || config.description
+  - const description = rawDescription ? strip_html(rawDescription).replace(/\s+/g, ' ').trim() : ''
+  if description
+    meta(name="description" content=truncate(description, 150))
 
