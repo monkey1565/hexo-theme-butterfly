@@ -15,11 +15,17 @@ mixin indexPostUI()
             .post_cover(class=leftOrRight)
               a(href=url_for(link) title=title)
                 if article.cover_type === 'img'
+                  - const responsiveCover = responsive_post_image(post_cover, 'index')
                   img.post-bg(
-                    src=url_for(post_cover) 
-                    onerror=`this.onerror=null;this.src='${url_for(theme.error_img.post_page)}'` 
+                    src=responsiveCover ? url_for(responsiveCover.src) : url_for(post_cover)
+                    srcset=responsiveCover ? responsiveCover.sources.map(item => `${url_for(item.url)} ${item.width}w`).join(', ') : null
+                    sizes=responsiveCover ? responsiveCover.sizes : null
+                    width=responsiveCover ? responsiveCover.width : null
+                    height=responsiveCover ? responsiveCover.height : null
+                    onerror=`this.onerror=null;this.removeAttribute('srcset');this.src='${url_for(post_cover)}'`
                     alt=title
-                    loading=index < 3 ? 'eager' : 'lazy'
+                    loading=index === 0 ? 'eager' : 'lazy'
+                    fetchpriority=index === 0 ? 'high' : 'auto'
                     style=`aspect-ratio: 16/9; object-fit: cover; width: 100%; height: 100%;`
                   )
                 else
