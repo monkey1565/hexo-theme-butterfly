@@ -889,9 +889,6 @@ document.addEventListener('DOMContentLoaded', () => {
     GLOBAL_CONFIG.islazyloadPlugin && lazyloadImg()
     GLOBAL_CONFIG.copyright !== undefined && addCopyright()
     
-    // 添加預載入提示
-    addPreloadHints()
-
     if (GLOBAL_CONFIG.autoDarkmode) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (btf.saveToLocal.get('theme') !== undefined) return

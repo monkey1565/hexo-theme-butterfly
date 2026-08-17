@@ -10,7 +10,11 @@ const urlFor = require('hexo-util').url_for.bind(hexo)
 
 const lazyload = htmlContent => {
   if (hexo.theme.config.lazyload.native) {
-    return htmlContent.replace(/(<img.*?)(>)/ig, '$1 loading=\'lazy\'$2')
+    return htmlContent.replace(/<img\b([^>]*)>/ig, (match, attributes) => {
+      const loading = /\sloading\s*=/i.test(attributes) ? '' : ' loading="lazy"'
+      const decoding = /\sdecoding\s*=/i.test(attributes) ? '' : ' decoding="async"'
+      return `<img${attributes}${loading}${decoding}>`
+    })
   }
 
   const bg = hexo.theme.config.lazyload.placeholder ? urlFor(hexo.theme.config.lazyload.placeholder) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
