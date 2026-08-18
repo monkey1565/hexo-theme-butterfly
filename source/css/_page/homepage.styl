@@ -17,16 +17,14 @@ $indexEnable = hexo-config('cover.index_enable')
       display: inline-block
       width: calc(100% / 2 - 8px)
       vertical-align: top
-      // 為masonry佈局設定固定高度比例
-      aspect-ratio: 1.2
+      // 讓標題、文章資訊與摘要自然撐開卡片，避免文字被 overflow 裁掉
+      height: auto
 
       +maxWidth768()
         width: 100%
-        aspect-ratio: 1.5
 
       +minWidth2000()
         width: calc(100% / 3 - 8px)
-        aspect-ratio: 1.3
 
     if $indexLayout == 1 || ($indexLayout == 2 || ($indexLayout == 3))
       display: flex
