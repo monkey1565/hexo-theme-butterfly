@@ -36,14 +36,35 @@ hexo.extend.helper.register('related_posts', function (currentPost, allPosts) {
     })
   })
 
-  if (relatedPosts.length === 0) {
-    return ''
-  }
   let result = ''
   const hexoConfig = hexo.config
   const config = hexo.theme.config
 
   const limitNum = config.related_post.limit || 6
+
+  // Posts with unique tags would otherwise get no recommendations at all,
+  // so fill the remaining slots with the newest posts of the same category.
+  if (relatedPosts.length < limitNum) {
+    const categoryNames = currentPost.categories.map(category => category.name)
+    allPosts.sort('date', -1).forEach(function (post) {
+      if (currentPost.path === post.path || findItem(relatedPosts, 'path', post.path) !== -1) return
+      if (!post.categories.some(category => categoryNames.includes(category.name))) return
+      relatedPosts.push({
+        title: post.title,
+        path: post.path,
+        cover: post.cover,
+        cover_type: post.cover_type,
+        weight: 0,
+        updated: post.updated,
+        created: post.date,
+        postDesc: post.postDesc || postDesc(post, hexo)
+      })
+    })
+  }
+
+  if (relatedPosts.length === 0) {
+    return ''
+  }
   const dateType = config.related_post.date_type || 'created'
   const headlineLang = this._p('post.recommend')
 
@@ -62,7 +83,7 @@ hexo.extend.helper.register('related_posts', function (currentPost, allPosts) {
       const className = postDesc ? 'pagination-related' : 'pagination-related no-desc'
       result += `<a class="${className}" href="${url_for(path)}" title="${title}">`
       if (cover_type === 'img') {
-        result += `<img class="cover" src="${url_for(cover)}" alt="cover">`
+        result += `<img class="cover" src="${url_for(cover)}" alt="${title}">`
       } else {
         result += `<div class="cover" style="background: ${cover}"></div>`
       }

@@ -8,6 +8,7 @@ if theme.structured_data
     const description = descriptionVal ? strip_html(descriptionVal).replace(/\s+/g, ' ').trim() : ''
     const imageVal = page.cover_type === 'img' ? page.cover : theme.avatar.img
     const image = imageVal ? full_url_for(imageVal) : ''
+    const logo = theme.avatar.img ? full_url_for(theme.avatar.img) : ''
     const inLanguage = Array.isArray(config.language) ? config.language[0] : (config.language || 'zh-TW')
     const socialLinks = theme.social ? Object.values(theme.social)
       .map(item => item && item.split(' || ')[0])
@@ -21,10 +22,10 @@ if theme.structured_data
       "alternateName": config.title
     }
 
-    if (image) {
+    if (logo) {
       organization.logo = {
         "@type": "ImageObject",
-        "url": image
+        "url": logo
       }
     }
 
@@ -101,6 +102,26 @@ if theme.structured_data
       }
 
       graph.push(article)
+
+      const breadcrumbItems = [{ name: config.title, url: full_url_for('/') }]
+      if (page.categories && page.categories.length) {
+        page.categories.forEach(category => {
+          breadcrumbItems.push({ name: category.name, url: full_url_for(url_for(category.path)) })
+        })
+      }
+      breadcrumbItems.push({ name: title, url: pageUrl })
+
+      graph.push({
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        "itemListElement": breadcrumbItems.map((item, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": item.name,
+          "item": item.url
+        }))
+      })
+      webPage.breadcrumb = { "@id": `${pageUrl}#breadcrumb` }
     }
 
     const jsonLd = {

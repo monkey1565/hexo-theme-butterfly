@@ -10,6 +10,9 @@ case globalPageType
   default
     - pageTitle = page.title || config.title || ''
 
+- var isErrorPage = page.type === '404'
+- if (isErrorPage) pageTitle = _p('error404')
+
 
 - var isSubtitle = config.subtitle ? ' - ' + config.subtitle : ''
 - var tabTitle = globalPageType === 'home' || !pageTitle ? config.title + isSubtitle : pageTitle + ' | ' + config.title
@@ -21,7 +24,7 @@ case globalPageType
 - var pagePath = page.path || ''
 - var isTaxonomyPage = ['tag', 'category', 'archive'].includes(globalPageType) || /^(tags|categories|archives)\//.test(pagePath)
 - var isPaginationPage = page.current && page.current > 1
-- var robotsContent = isTaxonomyPage || isPaginationPage ? 'noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
+- var robotsContent = isTaxonomyPage || isPaginationPage || isErrorPage ? 'noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
 - var canonicalHref = globalPageType === 'home' ? full_url_for('/') : urlNoIndex(null,config.pretty_urls.trailing_index,config.pretty_urls.trailing_html)
 
 meta(charset='UTF-8')

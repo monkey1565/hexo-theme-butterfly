@@ -6,6 +6,7 @@ if theme.Open_Graph_meta.enable
     let ogOption = Object.assign({
       type: globalPageType === 'post' ? 'article' : 'website',
       image: coverVal ? full_url_for(coverVal) : '',
+      twitter_card: page.cover_type === 'img' ? 'summary_large_image' : 'summary',
       description,
       fb_admins: theme.facebook_comments.user_id || '',
       fb_app_id: theme.facebook_comments.app_id || '',
